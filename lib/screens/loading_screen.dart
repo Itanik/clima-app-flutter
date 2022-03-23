@@ -1,4 +1,5 @@
 import 'package:clima/services/location.dart';
+import 'package:clima/services/networking.dart';
 import 'package:flutter/material.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -11,7 +12,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    _printPosition();
+    // _printPosition();
   }
 
   @override
@@ -20,7 +21,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            _printPosition();
+            // _printPosition();
+            _printWeatherData();
           },
           child: Text('Get Location'),
         ),
@@ -31,5 +33,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
   _printPosition() async {
     await _location.updatePosition();
     print("Latitude: ${_location.latitude}, longitude: ${_location.longitude}");
+  }
+
+  void _printWeatherData() async {
+    await _location.updatePosition();
+    var response = await Networking.getWeather(_location.latitude, _location.longitude);
+    print("Temperature: ${response['main']['temp']}");
   }
 }
