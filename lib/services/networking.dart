@@ -9,18 +9,21 @@ class Networking {
   static const String _latSuffix = "lat";
   static const String _longSuffix = "lon";
   static const String _apiKeySuffix = "appid";
+  static const String _unitsSuffix = "units";
+  static const String _units = "metric";
 
   static Future<Map<String, dynamic>> getWeather(
       double latitude, double longitude) async {
     Uri url = Uri.https(_authority, _weatherMethod, {
       _latSuffix: latitude.toString(),
       _longSuffix: longitude.toString(),
-      _apiKeySuffix: _apiKey
+      _apiKeySuffix: _apiKey,
+      _unitsSuffix: _units,
     });
 
     var response = await http.get(url);
 
-    if (response.statusCode / 100 == 2) {
+    if (response.statusCode == 200) {
       var map = convert.jsonDecode(response.body) as Map<String, dynamic>;
       return Future.value(map);
     } else {

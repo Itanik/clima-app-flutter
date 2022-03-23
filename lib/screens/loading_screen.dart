@@ -1,6 +1,8 @@
+import 'package:clima/screens/location_screen.dart';
 import 'package:clima/services/location.dart';
 import 'package:clima/services/networking.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -9,35 +11,44 @@ class LoadingScreen extends StatefulWidget {
 
 class _LoadingScreenState extends State<LoadingScreen> {
   final Location _location = Location();
+
   @override
   void initState() {
     super.initState();
-    // _printPosition();
+    getLocation().then(
+        (value) => getWeatherData().then((value) => goToLocationScreen(value)));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // _printPosition();
-            _printWeatherData();
-          },
-          child: Text('Get Location'),
+        child: SpinKitDoubleBounce(
+          color: Colors.white,
+          size: 100.0,
         ),
       ),
     );
   }
 
-  _printPosition() async {
+  Future getLocation() async {
     await _location.updatePosition();
     print("Latitude: ${_location.latitude}, longitude: ${_location.longitude}");
   }
 
-  void _printWeatherData() async {
+  Future getWeatherData() async {
     await _location.updatePosition();
-    var response = await Networking.getWeather(_location.latitude, _location.longitude);
-    print("Temperature: ${response['main']['temp']}");
+    var response =
+        await Networking.getWeather(_location.latitude, _location.longitude);
+    return response;
+  }
+
+  void goToLocationScreen(weatherData) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LocationScreen(
+                  weatherData: weatherData,
+                )));
   }
 }
