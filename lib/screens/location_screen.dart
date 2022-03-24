@@ -107,8 +107,16 @@ class _LocationScreenState extends State<LocationScreen> {
     );
   }
 
-  void _goToCityScreen() {
-    Navigator.push(
+  void _goToCityScreen() async {
+    var cityName = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => CityScreen()));
+    print(cityName);
+    if (cityName is String && cityName.isNotEmpty) {
+      _weatherModel
+          .getCityWeather(cityName)
+          .then((weatherData) => updateUI(data: weatherData))
+          .onError(
+              (error, stackTrace) => print('Error - $error \n $stackTrace'));
+    }
   }
 }

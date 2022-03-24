@@ -10,9 +10,14 @@ class WeatherModel {
   final LocationService _locationService = LocationService();
   final WeatherService _weatherService = WeatherService();
 
+  Future<Map<String, dynamic>> getCityWeather(String city) async {
+    return await _weatherService.getWeatherByCity(city);
+  }
+
   Future<Map<String, dynamic>> getWeatherData() async {
     await _locationService.updatePositionData();
-    return await _weatherService.getWeather(_locationService.latitude, _locationService.longitude);
+    return await _weatherService.getWeather(
+        _locationService.latitude, _locationService.longitude);
   }
 
   String getWeatherIcon(int condition) {
