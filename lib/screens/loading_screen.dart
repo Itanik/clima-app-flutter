@@ -1,6 +1,7 @@
 import 'package:clima/screens/location_screen.dart';
 import 'package:clima/services/location.dart';
 import 'package:clima/services/networking.dart';
+import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -10,13 +11,15 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  final Location _location = Location();
+  final WeatherModel _weatherModel = WeatherModel.instance;
 
   @override
   void initState() {
     super.initState();
-    getLocation().then(
-        (value) => getWeatherData().then((value) => goToLocationScreen(value)));
+    _weatherModel
+        .getWeatherData()
+        .onError((error, stackTrace) => _showAlertDialog(error))
+        .then((weatherData) => goToLocationScreen(weatherData));
   }
 
   @override
@@ -31,18 +34,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
     );
   }
 
-  Future getLocation() async {
-    await _location.updatePosition();
-    print("Latitude: ${_location.latitude}, longitude: ${_location.longitude}");
-  }
-
-  Future getWeatherData() async {
-    await _location.updatePosition();
-    var response =
-        await Networking.getWeather(_location.latitude, _location.longitude);
-    return response;
-  }
-
   void goToLocationScreen(weatherData) {
     Navigator.push(
         context,
@@ -50,5 +41,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
             builder: (context) => LocationScreen(
                   weatherData: weatherData,
                 )));
+  }
+
+  _showAlertDialog(error) {
+    print(error);
   }
 }

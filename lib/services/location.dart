@@ -1,15 +1,15 @@
 
 import 'package:geolocator/geolocator.dart';
 
-class Location {
+class LocationService {
   double latitude = 0;
   double longitude = 0;
 
-  Location() {
-    updatePosition();
+  LocationService() {
+    updatePositionData();
   }
 
-  Future<void> updatePosition() async {
+  Future<void> updatePositionData() async {
     Position position = await _determinePosition();
     latitude = position.latitude;
     longitude = position.longitude;

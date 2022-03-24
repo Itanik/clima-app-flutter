@@ -12,22 +12,26 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  double? temperature;
-  int? condition;
-  String? city;
+  final WeatherModel _weatherModel = WeatherModel.instance;
+  int _temperature = 0;
+  String _weatherIcon = '';
+  String _message = 'Unable to load weather';
 
   @override
   void initState() {
     super.initState();
-    updateUI(widget.weatherData);
+    updateUI(data: widget.weatherData);
   }
 
-  void updateUI(data) {
+  void updateUI({data}) async {
+    data ??= await _weatherModel.getWeatherData();
+    //print('updated data: $data');
     setState(() {
-      temperature = data['main']['temp'];
-      condition = data['weather'][0]['id'];
-      city = data['name'];
-      print('temp: $temperature, cond: $condition, city: $city');
+      double temp = data['main']['temp'];
+      _temperature = temp.toInt();
+      int condition = data['weather'][0]['id'];
+      _weatherIcon = _weatherModel.getWeatherIcon(condition);
+      _message = '${_weatherModel.getMessage(_temperature)} in ${data['name']}';
     });
   }
 
@@ -53,7 +57,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () { updateUI(); },
                     child: const Icon(
                       Icons.near_me,
                       size: 50.0,
@@ -73,20 +77,20 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Row(
                   children: <Widget>[
                     Text(
-                      '${temperature?.toInt()}°',
+                      '$_temperature°',
                       style: kTempTextStyle,
                     ),
-                     Text(
-                      WeatherModel.getWeatherIcon(condition ?? 800),
+                    Text(
+                      _weatherIcon,
                       style: kConditionTextStyle,
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(right: 15.0),
+                padding: const EdgeInsets.only(right: 15.0),
                 child: Text(
-                  WeatherModel.getMessage(temperature?.toInt() ?? 0) + ' in $city',
+                  _message,
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),

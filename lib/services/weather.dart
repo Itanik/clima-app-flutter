@@ -1,5 +1,21 @@
+import 'package:clima/services/location.dart';
+import 'package:clima/services/networking.dart';
+
 class WeatherModel {
-  static String getWeatherIcon(int condition) {
+  // singleton definition
+  static WeatherModel? _instance;
+  WeatherModel._();
+  static WeatherModel get instance => _instance ?? WeatherModel._();
+
+  final LocationService _locationService = LocationService();
+  final WeatherService _weatherService = WeatherService();
+
+  Future<Map<String, dynamic>> getWeatherData() async {
+    await _locationService.updatePositionData();
+    return await _weatherService.getWeather(_locationService.latitude, _locationService.longitude);
+  }
+
+  String getWeatherIcon(int condition) {
     if (condition < 300) {
       return '🌩';
     } else if (condition < 400) {
@@ -19,7 +35,7 @@ class WeatherModel {
     }
   }
 
-  static getMessage(int temp) {
+  String getMessage(int temp) {
     if (temp > 25) {
       return 'It\'s 🍦 time';
     } else if (temp > 20) {
@@ -30,4 +46,6 @@ class WeatherModel {
       return 'Bring a 🧥 just in case';
     }
   }
+
+  WeatherModel._internal();
 }
